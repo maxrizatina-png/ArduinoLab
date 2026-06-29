@@ -1,4 +1,6 @@
-export const colors = {
+export type ThemeMode = 'light' | 'dark';
+
+export const lightColors = {
   primary: '#3B82F6',
   background: '#F5F5F5',
   card: '#FFFFFF',
@@ -10,6 +12,21 @@ export const colors = {
   medium: '#FF9500',
   advanced: '#FF3B30',
 };
+
+export const darkColors: typeof lightColors = {
+  primary: '#3B82F6',
+  background: '#000000',
+  card: '#1C1C1E',
+  text: '#FFFFFF',
+  textSecondary: '#8E8E93',
+  border: '#38383A',
+  inputBackground: '#2C2C2E',
+  easy: '#34C759',
+  medium: '#FF9500',
+  advanced: '#FF3B30',
+};
+
+export const colors = lightColors;
 
 export const spacing = {
   xs: 4,

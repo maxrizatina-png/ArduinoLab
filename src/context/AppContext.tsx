@@ -8,9 +8,11 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockProjects } from '../data/mockProjects';
+import { lightColors, darkColors, type ThemeMode } from '../constants/theme';
 import type { Project, UserSubmission } from '../types';
 
 const FAVORITES_KEY = '@arduinolab:favorites';
+const THEME_KEY = '@arduinolab:theme';
 
 interface AppContextValue {
   projects: Project[];
@@ -19,6 +21,9 @@ interface AppContextValue {
   isFavorite: (id: string) => boolean;
   toggleFavorite: (id: string) => void;
   addSubmission: (data: Omit<UserSubmission, 'id' | 'status' | 'submittedAt'>) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
+  colors: typeof lightColors;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -26,16 +31,25 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [submissions, setSubmissions] = useState<UserSubmission[]>([]);
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
 
   useEffect(() => {
     AsyncStorage.getItem(FAVORITES_KEY)
       .then((raw) => { if (raw) setFavorites(JSON.parse(raw) as string[]); })
+      .catch(() => {});
+    AsyncStorage.getItem(THEME_KEY)
+      .then((raw) => { if (raw === 'dark' || raw === 'light') setThemeModeState(raw); })
       .catch(() => {});
   }, []);
 
   const persistFavorites = (ids: string[]) => {
     AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids)).catch(() => {});
   };
+
+  const setThemeMode = useCallback((mode: ThemeMode) => {
+    setThemeModeState(mode);
+    AsyncStorage.setItem(THEME_KEY, mode).catch(() => {});
+  }, []);
 
   const isFavorite = useCallback((id: string) => favorites.includes(id), [favorites]);
 
@@ -60,9 +74,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const colors = themeMode === 'dark' ? darkColors : lightColors;
+
   return (
     <AppContext.Provider
-      value={{ projects: mockProjects, favorites, submissions, isFavorite, toggleFavorite, addSubmission }}
+      value={{ projects: mockProjects, favorites, submissions, isFavorite, toggleFavorite, addSubmission, themeMode, setThemeMode, colors }}
     >
       {children}
     </AppContext.Provider>
