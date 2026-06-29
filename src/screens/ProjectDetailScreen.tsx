@@ -127,13 +127,6 @@ export function ProjectDetailScreen({ navigation, route }: Props) {
         </ScrollView>
       </Section>
 
-      {project.classCode ? (
-        <View style={styles.classCodeBadge}>
-          <Text style={styles.classCodeLabel}>Class code</Text>
-          <Text style={styles.classCodeValue}>{project.classCode}</Text>
-        </View>
-      ) : null}
-
       <View style={{ height: spacing.xl * 2 }} />
     </ScrollView>
   );
@@ -221,19 +214,5 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       color: '#D4D4D4',
       lineHeight: 20,
     },
-    classCodeBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-      marginHorizontal: spacing.md,
-      marginTop: spacing.md,
-      padding: spacing.md,
-      backgroundColor: '#F0F9FF',
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: '#BAE6FD',
-    },
-    classCodeLabel: { fontSize: 14, color: '#0369A1', fontWeight: '500' },
-    classCodeValue: { fontSize: 14, fontWeight: '700', color: '#0369A1' },
   });
 }

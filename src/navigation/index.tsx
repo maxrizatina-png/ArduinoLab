@@ -42,7 +42,7 @@ function MainTabs() {
         name="FavoritesTab"
         component={FavoritesScreen}
         options={{
-          title: 'Favorite Projects',
+          headerShown: false,
           tabBarLabel: 'Favorite Projects',
           tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
@@ -77,6 +77,7 @@ export function Navigation() {
             presentation: 'modal',
             headerStyle: { backgroundColor: colors.card },
             headerShadowVisible: false,
+            headerTintColor: colors.text,
             headerTitleStyle: { fontWeight: '700', fontSize: 17, color: colors.text },
           }}
         />
