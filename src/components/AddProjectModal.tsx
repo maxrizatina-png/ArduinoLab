@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Modal,
   View,
@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, spacing, radius } from '../constants/theme';
+import { spacing, radius } from '../constants/theme';
+import { useColors } from '../hooks/useColors';
 import { DifficultyBadge } from './DifficultyBadge';
 import { useApp } from '../context/AppContext';
 import type { Difficulty } from '../types';
@@ -28,6 +29,9 @@ interface Props {
 
 export function AddProjectModal({ visible, onClose }: Props) {
   const { addSubmission } = useApp();
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -87,14 +91,9 @@ export function AddProjectModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={reset}
-    >
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={reset}>
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.card }}
+        style={[styles.root, { backgroundColor: colors.card }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {/* Drag handle */}
@@ -122,11 +121,8 @@ export function AddProjectModal({ visible, onClose }: Props) {
           </View>
 
           {/* Project Image */}
-          <FieldLabel label="Project Image" required />
-          <TouchableOpacity
-            style={styles.imagePicker}
-            onPress={() => pickImage(setImageUri)}
-          >
+          <FieldLabel label="Project Image" required styles={styles} />
+          <TouchableOpacity style={styles.imagePicker} onPress={() => pickImage(setImageUri)}>
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.pickedImage} />
             ) : (
@@ -138,16 +134,17 @@ export function AddProjectModal({ visible, onClose }: Props) {
           </TouchableOpacity>
 
           {/* Project Title */}
-          <FieldLabel label="Project Title" required />
+          <FieldLabel label="Project Title" required styles={styles} />
           <TextInput
             style={styles.input}
             value={title}
             onChangeText={setTitle}
             returnKeyType="next"
+            placeholderTextColor={colors.textSecondary}
           />
 
           {/* Difficulty */}
-          <FieldLabel label="Difficulty Level" required />
+          <FieldLabel label="Difficulty Level" required styles={styles} />
           {DIFFICULTIES.map((d) => (
             <TouchableOpacity
               key={d}
@@ -163,31 +160,30 @@ export function AddProjectModal({ visible, onClose }: Props) {
           ))}
 
           {/* Description */}
-          <FieldLabel label="Description" required />
+          <FieldLabel label="Description" required styles={styles} />
           <TextInput
             style={[styles.input, styles.multiline]}
             value={description}
             onChangeText={setDescription}
             multiline
             textAlignVertical="top"
+            placeholderTextColor={colors.textSecondary}
           />
 
           {/* Instructions */}
-          <FieldLabel label="Step-by-Step Instructions" required />
+          <FieldLabel label="Step-by-Step Instructions" required styles={styles} />
           <TextInput
             style={[styles.input, styles.multiline]}
             value={instructions}
             onChangeText={setInstructions}
             multiline
             textAlignVertical="top"
+            placeholderTextColor={colors.textSecondary}
           />
 
           {/* Wiring Diagram */}
           <Text style={styles.label}>Wiring Diagram</Text>
-          <TouchableOpacity
-            style={styles.imagePicker}
-            onPress={() => pickImage(setWiringUri)}
-          >
+          <TouchableOpacity style={styles.imagePicker} onPress={() => pickImage(setWiringUri)}>
             {wiringUri ? (
               <Image source={{ uri: wiringUri }} style={styles.pickedImage} />
             ) : (
@@ -199,7 +195,7 @@ export function AddProjectModal({ visible, onClose }: Props) {
           </TouchableOpacity>
 
           {/* Arduino Code */}
-          <FieldLabel label="Arduino Code" required />
+          <FieldLabel label="Arduino Code" required styles={styles} />
           <TextInput
             style={[styles.input, styles.multiline, { marginBottom: spacing.xl }]}
             value={code}
@@ -208,6 +204,7 @@ export function AddProjectModal({ visible, onClose }: Props) {
             textAlignVertical="top"
             autoCorrect={false}
             autoCapitalize="none"
+            placeholderTextColor={colors.textSecondary}
           />
         </ScrollView>
 
@@ -229,7 +226,9 @@ export function AddProjectModal({ visible, onClose }: Props) {
   );
 }
 
-function FieldLabel({ label, required }: { label: string; required?: boolean }) {
+type Styles = ReturnType<typeof makeStyles>;
+
+function FieldLabel({ label, required, styles }: { label: string; required?: boolean; styles: Styles }) {
   return (
     <View style={styles.fieldHeader}>
       <Text style={styles.label}>{label}</Text>
@@ -238,169 +237,126 @@ function FieldLabel({ label, required }: { label: string; required?: boolean }) 
   );
 }
 
-const styles = StyleSheet.create({
-  handleBar: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#D1D5DB',
-    alignSelf: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  closeBtn: {
-    position: 'absolute',
-    right: spacing.md,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.inputBackground,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  body: {
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  banner: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  bannerText: {
-    fontSize: 14,
-    color: '#1D4ED8',
-    lineHeight: 20,
-  },
-  fieldHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.sm,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginTop: spacing.sm,
-  },
-  requiredText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 15,
-    color: colors.text,
-    backgroundColor: colors.card,
-    minHeight: 44,
-  },
-  multiline: {
-    minHeight: 80,
-    paddingTop: spacing.sm,
-  },
-  imagePicker: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.sm,
-    overflow: 'hidden',
-    minHeight: 48,
-  },
-  imagePickerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.md,
-  },
-  imagePickerText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-  },
-  pickedImage: {
-    width: '100%',
-    height: 180,
-    resizeMode: 'cover',
-  },
-  radioRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  radioOuter: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.textSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: {
-    borderColor: colors.primary,
-  },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
-  footer: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    padding: spacing.md,
-    paddingBottom: Platform.OS === 'ios' ? spacing.xl : spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  cancelBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  submitBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: radius.sm,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  submitDisabled: {
-    backgroundColor: '#93C5FD',
-  },
-  submitText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-});
+function makeStyles(colors: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    root: { flex: 1 },
+    handleBar: {
+      width: 36,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: colors.border,
+      alignSelf: 'center',
+      marginTop: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.md,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+    },
+    headerTitle: { fontSize: 17, fontWeight: '600', color: colors.text },
+    closeBtn: {
+      position: 'absolute',
+      right: spacing.md,
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: colors.inputBackground,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    body: { padding: spacing.md, gap: spacing.sm },
+    banner: {
+      backgroundColor: colors.primary + '18',
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    bannerText: { fontSize: 14, color: colors.primary, lineHeight: 20 },
+    fieldHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: spacing.sm,
+    },
+    label: { fontSize: 15, fontWeight: '600', color: colors.text, marginTop: spacing.sm },
+    requiredText: { fontSize: 13, color: colors.textSecondary },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: 15,
+      color: colors.text,
+      backgroundColor: colors.inputBackground,
+      minHeight: 44,
+    },
+    multiline: { minHeight: 80, paddingTop: spacing.sm },
+    imagePicker: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.sm,
+      overflow: 'hidden',
+      minHeight: 48,
+    },
+    imagePickerInner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      padding: spacing.md,
+    },
+    imagePickerText: { fontSize: 15, color: colors.textSecondary },
+    pickedImage: { width: '100%', height: 180, resizeMode: 'cover' },
+    radioRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    radioOuter: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: colors.textSecondary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    radioSelected: { borderColor: colors.primary },
+    radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary },
+    footer: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      padding: spacing.md,
+      paddingBottom: Platform.OS === 'ios' ? spacing.xl : spacing.md,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    cancelBtn: {
+      flex: 1,
+      height: 48,
+      borderRadius: radius.sm,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    cancelText: { fontSize: 16, fontWeight: '600', color: colors.text },
+    submitBtn: {
+      flex: 1,
+      height: 48,
+      borderRadius: radius.sm,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    submitDisabled: { backgroundColor: colors.primary + '60' },
+    submitText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  });
+}
