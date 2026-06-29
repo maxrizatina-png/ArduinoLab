@@ -35,7 +35,6 @@ export function AddProjectModal({ visible, onClose }: Props) {
   const [instructions, setInstructions] = useState('');
   const [wiringUri, setWiringUri] = useState<string | null>(null);
   const [code, setCode] = useState('');
-  const [classCode, setClassCode] = useState('');
 
   const pickImage = async (setter: (uri: string) => void) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -66,7 +65,6 @@ export function AddProjectModal({ visible, onClose }: Props) {
       description: description.trim(),
       instructions: instructions.trim(),
       arduinoCode: code.trim(),
-      classCode: classCode.trim() || undefined,
       imageUri: imageUri ?? undefined,
       wiringDiagramUri: wiringUri ?? undefined,
     });
@@ -85,7 +83,6 @@ export function AddProjectModal({ visible, onClose }: Props) {
     setInstructions('');
     setWiringUri(null);
     setCode('');
-    setClassCode('');
     onClose();
   };
 
@@ -204,23 +201,13 @@ export function AddProjectModal({ visible, onClose }: Props) {
           {/* Arduino Code */}
           <FieldLabel label="Arduino Code" required />
           <TextInput
-            style={[styles.input, styles.multiline]}
+            style={[styles.input, styles.multiline, { marginBottom: spacing.xl }]}
             value={code}
             onChangeText={setCode}
             multiline
             textAlignVertical="top"
             autoCorrect={false}
             autoCapitalize="none"
-          />
-
-          {/* Class code */}
-          <Text style={styles.label}>Class code</Text>
-          <TextInput
-            style={[styles.input, { marginBottom: spacing.xl }]}
-            value={classCode}
-            onChangeText={setClassCode}
-            autoCorrect={false}
-            autoCapitalize="characters"
           />
         </ScrollView>
 
