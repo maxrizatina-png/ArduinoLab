@@ -20,7 +20,7 @@ import { DifficultyBadge } from './DifficultyBadge';
 import { useApp } from '../context/AppContext';
 import type { Difficulty } from '../types';
 
-const DIFFICULTIES: Difficulty[] = ['Medium', 'Advanced', 'Easy'];
+const DIFFICULTIES: Difficulty[] = ['Easy', 'Medium', 'Advanced'];
 
 interface Props {
   visible: boolean;

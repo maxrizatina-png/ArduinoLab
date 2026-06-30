@@ -58,7 +58,8 @@ export function HomeScreen({ navigation }: Props) {
           <Ionicons name="menu" size={26} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addBtn} hitSlop={4}>
-          <Ionicons name="add" size={26} color="#fff" />
+          <Ionicons name="add" size={20} color="#fff" />
+          <Text style={styles.addBtnText}>Add Project</Text>
         </TouchableOpacity>
       </View>
 
@@ -149,13 +150,15 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       backgroundColor: colors.card,
     },
     addBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: 19,
-      backgroundColor: colors.primary,
+      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
+      gap: 4,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + 2,
+      borderRadius: radius.full,
+      backgroundColor: colors.primary,
     },
+    addBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
     searchRow: {
       flexDirection: 'row',
       alignItems: 'center',
